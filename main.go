@@ -41,15 +41,15 @@ func (h Hook) Run(e *zerolog.Event, level zerolog.Level, msg string) {
 	}
 
 	ctx := e.GetCtx()
-	span := trace.SpanFromContext(ctx)
+	span := trace.SpanFromContext(ctx).SpanContext()
 
 	var spanID trace.SpanID
 	var traceID trace.TraceID
 	var traceFlags trace.TraceFlags
-	if span.SpanContext().IsValid() {
-		spanID = span.SpanContext().SpanID()
-		traceID = span.SpanContext().TraceID()
-		traceFlags = span.SpanContext().TraceFlags()
+	if span.IsValid() {
+		spanID = span.SpanID()
+		traceID = span.TraceID()
+		traceFlags = span.TraceFlags()
 	}
 
 	severityText := level.String()
