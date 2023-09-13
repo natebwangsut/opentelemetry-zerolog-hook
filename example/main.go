@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"os"
+	"time"
 
 	otel "github.com/agoda-com/opentelemetry-logs-go"
 	"github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/otlplogs"
@@ -18,7 +19,7 @@ func newResource() *resource.Resource {
 	host, _ := os.Hostname()
 	return resource.NewWithAttributes(
 		semconv.SchemaURL,
-		semconv.ServiceName("otlplogs-example"),
+		semconv.ServiceName("otel-application"),
 		semconv.ServiceVersion("0.0.1"),
 		semconv.HostName(host),
 	)
@@ -33,9 +34,11 @@ func main() {
 		sdk.WithResource(newResource()),
 	)
 	otel.SetLoggerProvider(loggerProvider)
+	defer exporter.Shutdown(ctx)
 
 	hook := otelzerolog.NewHook(loggerProvider)
 	log := log.Hook(hook)
 
-	log.Info().Ctx(ctx).Msg("Hello OpenTelemetry")
+	log.Info().Ctx(ctx).Str("string", "string-value").Msg("Hello OpenTelemetry")
+	time.Sleep(10 * time.Second)
 }
